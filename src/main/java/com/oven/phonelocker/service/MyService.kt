@@ -42,7 +42,7 @@ class MyService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         event?.apply {
             datalist.forEach {
-                if (calendar?.get(Calendar.HOUR_OF_DAY)!! > 17) {//todo 临时处理
+                if (calendar?.get(Calendar.HOUR_OF_DAY)!! > 17 || calendar?.get(Calendar.HOUR_OF_DAY)!! < 23) {//todo 临时处理 17-23之间是可以耍的
                     return
                 }
                 if (it.packageName.toString() == event.packageName.toString()) {//如果打开了受控制的app,就跳转到一个页面
