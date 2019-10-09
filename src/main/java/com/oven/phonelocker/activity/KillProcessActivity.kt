@@ -5,6 +5,7 @@ import android.app.ActivityManager
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import androidx.annotation.RequiresApi
 import com.oven.phonelocker.common.AppCons
@@ -70,9 +71,11 @@ class KillProcessActivity : BaseActivity(), View.OnClickListener {
                     entity?.get(0)?.limitTime = System.currentTimeMillis()
                     BoxHelper.boxStore?.boxFor(AppinfoEntity::class.java)?.put(entity?.get(0))
                     EventBus.getDefault().post(AppCons.EB_DB_UPDATE)
-                    finish()
+                    Handler().postDelayed({
+                        finish()
+                    }, 1000)
                 } else {
-                    toast("输错了，耍锤子刷，滚切学习")
+                    toast("输错了，耍锤子耍，滚切学习")
                     super_code_tv.text = generateSuperCode()//重新刷新code
                 }
 

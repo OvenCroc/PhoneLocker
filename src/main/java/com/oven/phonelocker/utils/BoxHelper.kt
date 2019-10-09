@@ -14,4 +14,13 @@ object BoxHelper {
         boxStore = MyObjectBox.builder().androidContext(context).build()
     }
 
+    /**
+     * 获取所有的数据
+     *
+     * @author zhoupan
+     * Created at 2019/10/9 14:02
+     */
+    fun getList(cls: Class<*>): MutableList<out Any>? {
+        return boxStore?.boxFor(cls)?.query()?.build()?.find()
+    }
 }

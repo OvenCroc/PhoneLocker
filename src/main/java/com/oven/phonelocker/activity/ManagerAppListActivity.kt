@@ -13,9 +13,11 @@ import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback
 import com.chad.library.adapter.base.listener.OnItemSwipeListener
 import com.oven.phonelocker.R
 import com.oven.phonelocker.adapter.AppListAdapter
+import com.oven.phonelocker.common.AppCons
 import com.oven.phonelocker.entity.AppinfoEntity
 import com.oven.phonelocker.utils.BoxHelper
 import kotlinx.android.synthetic.main.manager_app_list_activity_layout.*
+import org.greenrobot.eventbus.EventBus
 
 /**
  * description:管理已添加app页面
@@ -42,7 +44,7 @@ class ManagerAppListActivity : BaseActivity(), OnItemSwipeListener,
         itemTouchHelper.attachToRecyclerView(mainRc)
         adapter?.enableSwipeItem()
         adapter?.setOnItemSwipeListener(this)
-        adapter?.setOnItemClickListener(this)
+        adapter?.onItemClickListener = this
         val decoration = DividerItemDecoration(this, LinearLayoutManager.VERTICAL)
         mainRc.addItemDecoration(decoration)
         mainRc.adapter = adapter
@@ -59,8 +61,8 @@ class ManagerAppListActivity : BaseActivity(), OnItemSwipeListener,
 
     override fun initData() {
         //从数据库获取数据
-        datalist = BoxHelper.boxStore?.boxFor(AppinfoEntity::class.java)?.query()?.build()?.find()
-            ?: mutableListOf()
+        datalist = (BoxHelper.getList(AppinfoEntity::class.java)
+            ?: mutableListOf()) as MutableList<AppinfoEntity>
         if (!datalist.isNullOrEmpty()) {//数据不为空的话
             adapter?.setNewData(datalist)
         }
@@ -73,6 +75,8 @@ class ManagerAppListActivity : BaseActivity(), OnItemSwipeListener,
         if (!datalist.isNullOrEmpty() && datalist.size > p1) {
             //删除数据库里面的数据
             BoxHelper.boxStore?.boxFor(AppinfoEntity::class.java)?.remove(datalist.get(p1))
+            //通知service里面更新数据
+            EventBus.getDefault().post(AppCons.EB_DB_UPDATE)
         }
     }
 

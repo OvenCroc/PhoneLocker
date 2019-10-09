@@ -89,8 +89,8 @@ class MyService : AccessibilityService() {
      * Created at 2019/10/8 14:54
      */
     private fun getDBData() {
-        datalist = BoxHelper.boxStore?.boxFor(AppinfoEntity::class.java)?.query()?.build()?.find()
-            ?: mutableListOf()
+        datalist = (BoxHelper.getList(AppinfoEntity::class.java)
+            ?: mutableListOf()) as MutableList<AppinfoEntity>
     }
 
     /**

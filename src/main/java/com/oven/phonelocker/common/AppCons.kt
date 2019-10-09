@@ -19,7 +19,7 @@ object AppCons {
     const val MODEL_END = "end_model"//模式解除
 
     //const value
-    const val USE_TIME_LIMIT = 1 * 60 * 1000//使用时间暂定是10分钟
+    const val USE_TIME_LIMIT = 10 * 60 * 1000//使用时间暂定是10分钟
 
     //eventbus order
     const val EB_DB_UPDATE = "db_update"
