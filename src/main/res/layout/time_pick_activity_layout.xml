@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="MissingPrefix">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/time_pick_tool_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/pick_time_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/normal_btn_height"
+        android:gravity="center"
+        android:paddingStart="@dimen/public_padding"
+        android:paddingEnd="@dimen/public_padding"
+        android:text="开始时间"
+        android:textColor="@color/white"
+        app:bl_corners_radius="@dimen/normal_btn_radius"
+        app:bl_ripple_color="@color/app_theme_focus"
+        app:bl_ripple_enable="true"
+        app:bl_solid_color="@color/app_theme"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/pick_end_time_tv"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/time_pick_tool_bar" />
+
+    <TextView
+        android:id="@+id/pick_end_time_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/normal_btn_height"
+        android:gravity="center"
+        android:paddingStart="@dimen/public_padding"
+        android:paddingEnd="@dimen/public_padding"
+        android:text="结束时间"
+        android:textColor="@color/white"
+        app:bl_corners_radius="@dimen/normal_btn_radius"
+        app:bl_ripple_color="@color/app_theme_focus"
+        app:bl_ripple_enable="true"
+        app:bl_solid_color="@color/app_theme"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/pick_time_tv"
+        app:layout_constraintTop_toBottomOf="@id/time_pick_tool_bar" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

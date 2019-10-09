@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:ignore="MissingPrefix">
+
+
+    <TextView
+        android:id="@+id/super_code_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/block_margin"
+        android:padding="@dimen/public_padding"
+        android:textColor="@color/white"
+        app:bl_corners_radius="@dimen/normal_btn_radius"
+        app:bl_solid_color="@color/app_theme"
+        app:layout_constraintBottom_toTopOf="@id/kill_bg_process_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_percent="0.6" />
+
+    <Button
+        android:id="@+id/kill_bg_process_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="kill"
+        android:textColor="@color/white"
+        app:bl_corners_radius="@dimen/normal_btn_radius"
+        app:bl_ripple_color="@color/app_theme_focus"
+        app:bl_ripple_enable="true"
+        app:bl_solid_color="@color/app_theme"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/super_code_et"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/normal_btn_height"
+        android:layout_marginTop="@dimen/public_margin"
+        android:hint="请输入超长验证码"
+        android:paddingStart="@dimen/public_padding"
+        android:paddingEnd="@dimen/public_padding"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        app:bl_corners_radius="@dimen/normal_btn_radius"
+        app:bl_ripple_color="@color/app_theme_focus"
+        app:bl_ripple_enable="true"
+        app:bl_solid_color="@color/app_theme"
+        app:layout_constraintEnd_toEndOf="@id/super_code_tv"
+        app:layout_constraintStart_toStartOf="@id/super_code_tv"
+        app:layout_constraintTop_toBottomOf="@id/kill_bg_process_btn" />
+</androidx.constraintlayout.widget.ConstraintLayout>
