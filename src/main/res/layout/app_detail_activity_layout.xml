@@ -20,7 +20,7 @@
         android:layout_margin="@dimen/public_margin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/titleBar"
-        tools:src="@mipmap/ic_launcher" />
+        tools:src="@mipmap/icon" />
 
     <TextView
         android:id="@+id/appNameTv"
