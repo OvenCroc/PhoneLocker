@@ -30,7 +30,7 @@ class AppListAdapter(
     override fun convert(helper: BaseViewHolder?, item: AppinfoEntity?) {
         helper?.apply {
             Glide.with(this@AppListAdapter.mContext)
-                .load(item?.iconRes)
+                .load(mContext.packageManager.getApplicationIcon(item?.packageName))
                 .into(getView(R.id.app_icon_img))
             setText(
                 R.id.app_name_tv,

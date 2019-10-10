@@ -87,6 +87,7 @@ class AppListActivity : BaseActivity(), View.OnClickListener {
                 } ?: mutableListOf())//非系统app
         dataList.clear()
         appList?.forEach {
+            it.applicationInfo.loadIcon(packageManager)
             dataList.add(
                 AppinfoEntity(
                     appName = it.applicationInfo.loadLabel(packageManager).toString(),

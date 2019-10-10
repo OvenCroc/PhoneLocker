@@ -74,7 +74,7 @@ class ManagerAppListActivity : BaseActivity(), OnItemSwipeListener,
     override fun onItemSwiped(p0: RecyclerView.ViewHolder?, p1: Int) {
         if (!datalist.isNullOrEmpty() && datalist.size > p1) {
             //删除数据库里面的数据
-            BoxHelper.boxStore?.boxFor(AppinfoEntity::class.java)?.remove(datalist.get(p1))
+            BoxHelper.boxStore?.boxFor(AppinfoEntity::class.java)?.remove(datalist[p1])
             //通知service里面更新数据
             EventBus.getDefault().post(AppCons.EB_DB_UPDATE)
         }

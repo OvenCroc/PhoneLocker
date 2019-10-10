@@ -6,6 +6,7 @@ import android.view.View
 import com.oven.phonelocker.R
 import com.oven.phonelocker.common.AppCons
 import com.oven.phonelocker.utils.SPUtils
+import com.oven.phonelocker.utils.Utils
 import kotlinx.android.synthetic.main.time_pick_activity_layout.*
 import java.util.*
 
@@ -81,7 +82,7 @@ class TimePickActivity : BaseActivity(), View.OnClickListener {
         TimePickerDialog(
             this,
             TimePickerDialog.OnTimeSetListener { view, hourOfDay, minute ->
-                val timeStr = timeStrMake(hourOfDay) + ":" + timeStrMake(minute)
+                val timeStr = Utils.timeStrMake(hourOfDay) + ":" + Utils.timeStrMake(minute)
                 if (v == pick_time_tv) {
                     //设置开始时间,要存本地的sp
                     SPUtils.getInstance().put(AppCons.sp_start_time, timeStr)
@@ -97,13 +98,6 @@ class TimePickActivity : BaseActivity(), View.OnClickListener {
             defaultMinute!!,
             false
         ).show()
-    }
-
-    fun timeStrMake(time: Int): String {
-        return if (time in 0 until 10) {
-            "0$time"
-        } else
-            time.toString()
     }
 
 }

@@ -5,7 +5,10 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
+import android.os.Handler
 import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityNodeInfo
 import com.oven.phonelocker.activity.KillProcessActivity
 import com.oven.phonelocker.activity.mylog
 import com.oven.phonelocker.common.AppCons
@@ -13,8 +16,10 @@ import com.oven.phonelocker.entity.AppinfoEntity
 import com.oven.phonelocker.receiver.TimeReceiver
 import com.oven.phonelocker.utils.BoxHelper
 import com.oven.phonelocker.utils.SPUtils
+import com.oven.phonelocker.utils.Utils
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
+import java.text.SimpleDateFormat
 import java.util.*
 
 /**
@@ -40,12 +45,76 @@ class MyService : AccessibilityService() {
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+        autoSign(event)
+        doAppController(event)
+    }
+
+    /**
+     * 自动签到功能
+     *
+     * @author zhoupan
+     * Created at 2019/10/9 16:57
+     */
+    private fun autoSign(event: AccessibilityEvent?) {
+        event?.apply {
+            if (this.packageName == "com.ultrapower.android.me.ry") {//签到app
+                val info: AccessibilityNodeInfo? =
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        rootInActiveWindow
+                    } else {
+                        null
+                    }
+                info?.apply {
+                    //                    tvCancel
+//                    bottomBar2
+                    if (event.className == "com.ultrapower.android.main.MainActivity") {
+                    }
+
+                    performClick("item_recycler_app", info)
+                    info.recycle()
+                }
+            }
+            mylog("event.classname!!!: ${event.className}")
+        }
+
+    }
+
+    private fun performClick(viewId: String, info: AccessibilityNodeInfo) {
+        val list = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            info?.findAccessibilityNodeInfosByViewId("${this.packageName}:id/$viewId")
+        } else {
+            null
+        }
+        if (list != null && list.size > 0 && list[0].isClickable) {
+            list[0].performAction(AccessibilityNodeInfo.ACTION_FOCUS)
+            list[0].performAction(AccessibilityNodeInfo.ACTION_CLICK)
+        }
+    }
+
+    /**
+     * 控制app流程
+     *
+     * @author zhoupan
+     * Created at 2019/10/9 16:56
+     */
+    private fun doAppController(event: AccessibilityEvent?) {
         event?.apply {
             datalist.forEach {
-                if (calendar?.get(Calendar.HOUR_OF_DAY)!! in 18..22) {//todo 临时处理 17-23之间是可以耍的
-                    return
-                }
                 if (it.packageName.toString() == event.packageName.toString()) {//如果打开了受控制的app,就跳转到一个页面
+                    val zoneStrArr = it.allowTimeZone?.split(",")
+                    val df = SimpleDateFormat("HH:mm")
+                    val startTime = df.parse(zoneStrArr?.get(0)!!)
+                    val endTime = df.parse(zoneStrArr?.get(1)!!)
+                    val nowTime =
+                        df.parse(
+                            Utils.timeStrMake(
+                                calendar?.get(Calendar.HOUR_OF_DAY) ?: 0
+                            ) + ":" + Utils.timeStrMake(calendar?.get(Calendar.MINUTE) ?: 0)
+                        )
+                    if (nowTime.time in startTime.time..endTime.time) {
+                        mylog("在时间内，耍吧你就")
+                        return
+                    }
                     if (System.currentTimeMillis() - it.limitTime > AppCons.USE_TIME_LIMIT) {            //判断是否已经通过自己的supercode了
                         val i = Intent(this@MyService, KillProcessActivity::class.java)
                         i.putExtra("targetPackageName", event.packageName.toString())

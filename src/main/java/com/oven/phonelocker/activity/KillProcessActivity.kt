@@ -49,11 +49,11 @@ class KillProcessActivity : BaseActivity(), View.OnClickListener {
      */
     private fun generateSuperCode(): String {
         val str =
-            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*-()_+{}:,.|"
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*-()_+{}:,."
         val random = Random()
         val sb = StringBuffer()
         for (i in 0 until 32) {
-            val number = random.nextInt(81)
+            val number = random.nextInt(80)
             sb.append(str[number])
         }
         return sb.toString()
