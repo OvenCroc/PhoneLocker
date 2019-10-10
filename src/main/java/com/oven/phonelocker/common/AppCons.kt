@@ -22,5 +22,12 @@ object AppCons {
     const val USE_TIME_LIMIT = 10 * 60 * 1000//使用时间暂定是10分钟
 
     //eventbus order
+    /**
+     * 更新了数据库
+     */
     const val EB_DB_UPDATE = "db_update"
+    /**
+     * 回到首页
+     */
+    const val EB_TO_HOME = "to_home"
 }

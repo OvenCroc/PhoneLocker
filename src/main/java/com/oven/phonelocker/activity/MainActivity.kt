@@ -14,6 +14,7 @@ import com.oven.phonelocker.common.AppCons
 import com.oven.phonelocker.service.MyService
 import com.oven.phonelocker.utils.PermissionUtils
 import kotlinx.android.synthetic.main.activity_main.*
+import org.greenrobot.eventbus.EventBus
 
 class MainActivity : BaseActivity(), View.OnClickListener {
     /**
@@ -122,6 +123,10 @@ class MainActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
+    override fun onBackPressed() {
+        EventBus.getDefault().post(AppCons.EB_TO_HOME)
+    }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -136,10 +141,13 @@ class MainActivity : BaseActivity(), View.OnClickListener {
     }
 }
 
-fun Context.toast(str: String) {
+fun Context.toast(str: String, isPrintLog: Boolean? = false) {
     str.apply {
         Toast.makeText(this@toast, str, Toast.LENGTH_LONG)
             .show()
+    }
+    if (isPrintLog!!) {
+        mylog(str)
     }
 }
 
