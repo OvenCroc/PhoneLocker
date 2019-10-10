@@ -5,6 +5,7 @@ import android.animation.ObjectAnimator
 import android.annotation.TargetApi
 import android.app.AlarmManager
 import android.app.PendingIntent
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.graphics.PixelFormat
@@ -39,6 +40,7 @@ class MyService : AccessibilityService(), View.OnClickListener, View.OnTouchList
 
     var calendar: Calendar? = null
     var alertView: View? = null
+    var anim: ObjectAnimator? = null
     override fun onCreate() {
         super.onCreate()
         calendar = Calendar.getInstance(Locale.CHINA)
@@ -134,11 +136,17 @@ class MyService : AccessibilityService(), View.OnClickListener, View.OnTouchList
                 }
             info?.apply {
                 //                    tvCancel
-//                    bottomBar2
-                if (event.className == "com.ultrapower.android.main.MainActivity") {
+                when (event.className) {
+                    "com.ultrapower.android.main.MainActivity" -> {//进入首页了之后,点击应用
+                        performClick("bottomBar2", info)
+                    }
+                    "com.ultrapower.oatimer.ui.OATimerActivity" -> {//进入地图页面
+                        Handler().postDelayed({
+                            performClick("ll_clock_button", info)
+                        }, 2000)
+                    }
                 }
-
-                performClick("item_recycler_app", info)
+                performClick("item_recycler_app", info)//点击地图签到
                 info.recycle()
             }
             mylog("event.classname!!!: ${event.className}")
@@ -187,9 +195,10 @@ class MyService : AccessibilityService(), View.OnClickListener, View.OnTouchList
                     )
                 if (nowTime.time in startTime.time..endTime.time) {
                     mylog("在时间内，耍吧你就")
+                    it.limitTime = System.currentTimeMillis()
                     return
                 }
-                if (System.currentTimeMillis() - it.limitTime > AppCons.USE_TIME_LIMIT) {            //判断是否已经通过自己的supercode了
+                if (System.currentTimeMillis() - it.limitTime > AppCons.USE_TIME_LIMIT) {
                     val i = Intent(this@MyService, KillProcessActivity::class.java)
                     i.putExtra("targetPackageName", event.packageName.toString())
                     i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -273,11 +282,21 @@ class MyService : AccessibilityService(), View.OnClickListener, View.OnTouchList
         manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pi)
     }
 
+    private fun callApp() {
+        val intent = Intent(Intent.ACTION_MAIN)
+        /**知道要跳转应用的包命与目标Activity*/
+        val componentName = ComponentName(
+            "com.ultrapower.android.me.ry",
+            "com.ultrapower.android.login.SplashActivity"
+        )
+        intent.component = componentName
+        startActivity(intent)
+    }
+
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.alert_view_tv -> {
                 toast("∑(っ°Д°;)っ\n点我干嘛,快点学习啊")
-                mylog("x: ${alertView?.x}  y: ${alertView?.y}")
                 startAnim()
             }
         }
@@ -292,14 +311,21 @@ class MyService : AccessibilityService(), View.OnClickListener, View.OnTouchList
     @TargetApi(Build.VERSION_CODES.O)
     private fun startAnim() {
         alertView?.apply {
-            val anim = ObjectAnimator.ofFloat(alertView, "TranslationY", 0f, 200f)
-            anim.interpolator = DecelerateInterpolator(0.1f)
-            anim.duration = 1000
-            anim.start()
-            Handler().postDelayed({
-                anim.reverse()
-                invalidate()
-            }, 2000)
+            if (anim == null) {
+                anim = ObjectAnimator.ofFloat(alertView, "TranslationY", 0f, 200f)
+            }
+            anim?.apply {
+                interpolator = DecelerateInterpolator(1f)
+                duration = 1000
+                if (this.isRunning) {
+                    return
+                }
+                start()
+                Handler().postDelayed({
+                    reverse()
+                    invalidate()
+                }, 4000)
+            }
             invalidate()
         }
 

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    tools:ignore="MissingPrefix">
+
+    <TextView
+        android:id="@+id/alert_view_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="@dimen/public_padding"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        app:bl_corners_radius="@dimen/normal_btn_radius"
+        app:bl_ripple_color="@color/label_dark_color"
+        app:bl_ripple_enable="true"
+        app:bl_solid_color="@color/half_white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="text" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
