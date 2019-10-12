@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.oven.phonelocker.activity.mylog
+import com.oven.phonelocker.activity.toast
 import com.oven.phonelocker.common.AppCons
 
 /**
@@ -20,6 +21,9 @@ class TimeReceiver : BroadcastReceiver() {
                     }
                     AppCons.MODEL_END -> {
                         mylog("作死模式结束了,可以耍手机了")
+                    }
+                    AppCons.MODEL_AUTO_LOGIN -> {
+                        toast("autologin", true)
                     }
                 }
             }

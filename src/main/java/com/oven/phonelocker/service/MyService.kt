@@ -2,48 +2,45 @@ package com.oven.phonelocker.service
 
 import android.accessibilityservice.AccessibilityService
 import android.animation.ObjectAnimator
-import android.annotation.TargetApi
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.graphics.PixelFormat
 import android.os.Build
 import android.os.Handler
-import android.view.*
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
-import android.view.animation.DecelerateInterpolator
+import android.widget.TextView
 import com.noober.background.BackgroundLibrary
 import com.oven.phonelocker.R
 import com.oven.phonelocker.activity.KillProcessActivity
 import com.oven.phonelocker.activity.mylog
 import com.oven.phonelocker.activity.toast
 import com.oven.phonelocker.common.AppCons
+import com.oven.phonelocker.customview.FlyView
 import com.oven.phonelocker.entity.AppinfoEntity
-import com.oven.phonelocker.receiver.TimeReceiver
 import com.oven.phonelocker.utils.BoxHelper
-import com.oven.phonelocker.utils.SPUtils
 import com.oven.phonelocker.utils.Utils
-import kotlinx.android.synthetic.main.add_view_layout.view.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import java.text.SimpleDateFormat
 import java.util.*
 
+
 /**
  * description: PhoneLocker
  * Created by xm zhoupan on 2019/9/27.
  */
-class MyService : AccessibilityService(), View.OnClickListener, View.OnTouchListener {
+class MyService : AccessibilityService(), View.OnClickListener {
 
     var calendar: Calendar? = null
-    var alertView: View? = null
+    var alertView: FlyView? = null
     var anim: ObjectAnimator? = null
     override fun onCreate() {
         super.onCreate()
-        calendar = Calendar.getInstance(Locale.CHINA)
         EventBus.getDefault().register(this)
         BackgroundLibrary.inject(this)
         addViewToWindowManager()
@@ -76,12 +73,29 @@ class MyService : AccessibilityService(), View.OnClickListener, View.OnTouchList
         if (windowManager == null) {
             windowManager = application.getSystemService(Context.WINDOW_SERVICE) as WindowManager?
         }
-        alertView = LayoutInflater.from(this).inflate(R.layout.add_view_layout, null)
+        alertView = FlyView(this)
         alertView?.apply {
-            this.alert_view_tv.text = "๑乛◡乛๑"
-            this.alert_view_tv.setOnClickListener(this@MyService)
+            this.listener = flyViewListener
+            changeFlyViewText()
             var layoutParams = initLayoutParam()
+            this.setLayoutParam(layoutParams)
             windowManager?.addView(this, layoutParams)
+        }
+    }
+
+    private fun changeFlyViewText(s: String? = "") {
+        alertView?.findViewById<TextView>(R.id.alert_view_tv)?.text = "๑乛◡乛๑ $s"
+    }
+
+    private val flyViewListener: FlyView.FlyViewListener = object : FlyView.FlyViewListener {
+        override fun onLongClick(view: FlyView) {
+        }
+
+        override fun onClick(view: FlyView) {
+            toast("∑(っ°Д°;)っ\n点我干嘛,快点学习啊")
+        }
+
+        override fun onMove(view: FlyView) {
         }
     }
 
@@ -102,11 +116,12 @@ class MyService : AccessibilityService(), View.OnClickListener, View.OnTouchList
         }
         // set bg transparent
         params.format = PixelFormat.RGBA_8888
-        params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+        params.flags =
+            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
         params.x = 0
         params.y = 0
         // window size
-        params.gravity = Gravity.TOP or Gravity.RIGHT
+        params.gravity = Gravity.TOP or Gravity.LEFT
         params.width = ViewGroup.LayoutParams.WRAP_CONTENT
         params.height = ViewGroup.LayoutParams.WRAP_CONTENT
         return params
@@ -114,9 +129,38 @@ class MyService : AccessibilityService(), View.OnClickListener, View.OnTouchList
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         event?.apply {
-            mylog("eventtype: ${AccessibilityEvent.eventTypeToString(eventType)}")
+            //            mylog("eventtype: ${AccessibilityEvent.eventTypeToString(eventType)}")
+//            mylog("event.classname!!!: ${event.className}")
+            mylog("eventtostring ${event.toString()}")
             autoSign(event)
-            doAppController(event)
+            when (eventType) {
+                AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED -> {//通知
+                    isSignAlarm(event)
+                }
+                AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
+                    doAppController(event)
+                }
+                AccessibilityEvent.TYPE_VIEW_FOCUSED -> {//小米手机上闹铃在解锁屏幕状态下是没有notification的
+                    isSignAlarm(event)
+                }
+            }
+        }
+    }
+
+    /**
+     * 判断当前是否是签到的闹铃
+     *
+     * @author zhoupan
+     * Created at 2019/10/11 13:00
+     */
+    private fun isSignAlarm(event: AccessibilityEvent) {
+        if (event.packageName == "com.android.deskclock") {
+            event.text?.forEach {
+                if (it.contains("打卡啊")) {
+                    callApp("com.ultrapower.android.me.ry")
+                    return
+                }
+            }
         }
     }
 
@@ -137,19 +181,23 @@ class MyService : AccessibilityService(), View.OnClickListener, View.OnTouchList
             info?.apply {
                 //                    tvCancel
                 when (event.className) {
-                    "com.ultrapower.android.main.MainActivity" -> {//进入首页了之后,点击应用
+                    "com.ultrapower.android.main.MainActivity",
+                    "com.ultrapower.android.main.Main1Activity"
+                    -> {//进入首页了之后,点击应用
                         performClick("bottomBar2", info)
+                        Handler().postDelayed({
+                            performClick("item_recycler_app", info)//点击地图签到
+                            info.recycle()
+                        }, 2000)
                     }
                     "com.ultrapower.oatimer.ui.OATimerActivity" -> {//进入地图页面
                         Handler().postDelayed({
                             performClick("ll_clock_button", info)
-                        }, 2000)
+                            info.recycle()
+                        }, 30000)//30s之后再进行签到操作
                     }
                 }
-                performClick("item_recycler_app", info)//点击地图签到
-                info.recycle()
             }
-            mylog("event.classname!!!: ${event.className}")
         }
     }
 
@@ -181,24 +229,25 @@ class MyService : AccessibilityService(), View.OnClickListener, View.OnTouchList
      * Created at 2019/10/9 16:56
      */
     private fun doAppController(event: AccessibilityEvent) {
-        datalist.forEach {
+        datalist?.forEach {
             if (it.packageName.toString() == event.packageName.toString()) {//如果打开了受控制的app,就跳转到一个页面
+                calendar = Calendar.getInstance(Locale.CHINA)
                 val zoneStrArr = it.allowTimeZone?.split(",")
                 val df = SimpleDateFormat("HH:mm")
                 val startTime = df.parse(zoneStrArr?.get(0)!!)
                 val endTime = df.parse(zoneStrArr?.get(1)!!)
-                val nowTime =
-                    df.parse(
-                        Utils.timeStrMake(
-                            calendar?.get(Calendar.HOUR_OF_DAY) ?: 0
-                        ) + ":" + Utils.timeStrMake(calendar?.get(Calendar.MINUTE) ?: 0)
-                    )
-                if (nowTime.time in startTime.time..endTime.time) {
+                val nowTimeStr = Utils.timeStrMake(
+                    calendar?.get(Calendar.HOUR_OF_DAY) ?: 0
+                ) + ":" + Utils.timeStrMake(calendar?.get(Calendar.MINUTE) ?: 0)
+                val nowTime = df.parse(nowTimeStr)
+                mylog("判断的当前时间 : $nowTimeStr")
+                if (nowTime.time in startTime.time..endTime.time) {//如果在限定时间内 就不去处理剩余可以玩时间了..
                     mylog("在时间内，耍吧你就")
                     it.limitTime = System.currentTimeMillis()
                     return
                 }
                 if (System.currentTimeMillis() - it.limitTime > AppCons.USE_TIME_LIMIT) {
+                    changeFlyViewText()
                     val i = Intent(this@MyService, KillProcessActivity::class.java)
                     i.putExtra("targetPackageName", event.packageName.toString())
                     i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -206,9 +255,8 @@ class MyService : AccessibilityService(), View.OnClickListener, View.OnTouchList
                     return@forEach
                 } else {
                     //提示用户当前还有多少分钟可以耍
-                    val leaveTime =
-                        (System.currentTimeMillis() - it.limitTime) / 1000 / 60
-                    mylog("你还有少于 ${leaveTime + 1} 分钟可以耍")
+                    val deadLineTime = AppCons.USE_TIME_LIMIT + it.limitTime
+                    changeFlyViewText("到${df.format(Date(deadLineTime))}，就不能玩了啊")
                 }
             }
         }
@@ -216,12 +264,15 @@ class MyService : AccessibilityService(), View.OnClickListener, View.OnTouchList
 
     @Subscribe
     fun onEvent(message: String) {
-        when (message) {
+        when (message.split("|")[0]) {
             AppCons.EB_DB_UPDATE -> {//表示数据更新了
                 getDBData()//重新获取一下数据库里面的数据
             }
             AppCons.EB_TO_HOME -> {//回收也
                 this.performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME)
+            }
+            AppCons.EB_MODIFY_FLY_VIEW_TEXT -> {//更改悬浮窗文字的事件
+                changeFlyViewText("${message.split("|")[1]}")
             }
         }
     }
@@ -231,8 +282,7 @@ class MyService : AccessibilityService(), View.OnClickListener, View.OnTouchList
         super.onServiceConnected()
         toast("服务启动", true)
         getDBData()
-        //创建一个计时器
-        createAlarms()
+//        createAlarm("11:50", AppCons.MODEL_AUTO_LOGIN)
     }
 
     /**
@@ -246,116 +296,25 @@ class MyService : AccessibilityService(), View.OnClickListener, View.OnTouchList
             ?: mutableListOf()) as MutableList<AppinfoEntity>
     }
 
+
     /**
-     * 创建一个计时器
+     * 打开app
      *
      * @author zhoupan
-     * Created at 2019/10/8 10:36
+     * Created at 2019/10/11 9:48
      */
-    private fun createAlarms() {
-        val modelStartTime = SPUtils.getInstance().getString(AppCons.sp_start_time)
-        val modelEndTime = SPUtils.getInstance().getString(AppCons.sp_end_time)
-        if (!modelStartTime.isNullOrBlank()) {//本地已经选择过开始时间和结束时间了,设置开始时间的
-            createAlarm(modelStartTime, AppCons.MODEL_START)
-            mylog("设置模式开始时候的闹铃触发$modelStartTime")
+    private fun callApp(packageName: String) {
+        try {
+            startActivity(packageManager.getLaunchIntentForPackage(packageName))
+            toast("跳转到app $packageName 咯", true)
+        } catch (e: Exception) {
+            toast("跳转其他app出现意外 ${e.printStackTrace()}", true)
         }
-        if (!modelEndTime.isNullOrBlank()) {
-            createAlarm(modelEndTime, AppCons.MODEL_END)
-            mylog("设置模式结束时候的闹铃触发$modelEndTime")
-        }
-    }
-
-    /**
-     * 根据时间创建闹铃
-     *  @param time 传入的格式是00:00
-     * @author zhoupan
-     * Created at 2019/10/8 11:01
-     */
-    private fun createAlarm(time: String, action: String) {
-        val calendar = Calendar.getInstance(Locale.CHINA)
-        calendar.set(Calendar.HOUR_OF_DAY, time.split(":")[0].toInt())
-        calendar.set(Calendar.MINUTE, time.split(":")[1].toInt())
-        val manager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, TimeReceiver::class.java)
-        intent.action = action
-        val pi = PendingIntent.getBroadcast(this, 0, intent, 0)
-        manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pi)
-    }
-
-    private fun callApp() {
-        val intent = Intent(Intent.ACTION_MAIN)
-        /**知道要跳转应用的包命与目标Activity*/
-        val componentName = ComponentName(
-            "com.ultrapower.android.me.ry",
-            "com.ultrapower.android.login.SplashActivity"
-        )
-        intent.component = componentName
-        startActivity(intent)
     }
 
     override fun onClick(v: View?) {
         when (v?.id) {
-            R.id.alert_view_tv -> {
-                toast("∑(っ°Д°;)っ\n点我干嘛,快点学习啊")
-                startAnim()
-            }
         }
     }
-
-    /**
-     * 动起来
-     *
-     * @author zhoupan
-     * Created at 2019/10/10 16:57
-     */
-    @TargetApi(Build.VERSION_CODES.O)
-    private fun startAnim() {
-        alertView?.apply {
-            if (anim == null) {
-                anim = ObjectAnimator.ofFloat(alertView, "TranslationY", 0f, 200f)
-            }
-            anim?.apply {
-                interpolator = DecelerateInterpolator(1f)
-                duration = 1000
-                if (this.isRunning) {
-                    return
-                }
-                start()
-                Handler().postDelayed({
-                    reverse()
-                    invalidate()
-                }, 4000)
-            }
-            invalidate()
-        }
-
-    }
-
-    override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-        when (v?.id) {
-            R.id.alert_view_tv -> {
-                handlerTouchEvent(v, event)
-                return true
-            }
-            else -> {
-                return false
-            }
-        }
-    }
-
-    private fun handlerTouchEvent(v: View, event: MotionEvent?) {
-        when (event?.action) {
-            MotionEvent.ACTION_DOWN -> {//点下的时候
-                mylog("点击了下")
-            }
-            MotionEvent.ACTION_MOVE -> {//移动
-                mylog("在移动了")
-            }
-            MotionEvent.ACTION_UP -> {
-                mylog("抬手了...")
-            }
-        }
-    }
-
 
 }

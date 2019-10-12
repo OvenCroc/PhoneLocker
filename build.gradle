@@ -27,6 +27,12 @@ android {
             keyAlias "ovenmvpdemokey"
             keyPassword "zhoupan22"
         }
+        debug {
+            storeFile file("F:\\zhoupan\\keystore\\OvenMVPDemoKey.jks")
+            storePassword "zhoupan22"
+            keyAlias "ovenmvpdemokey"
+            keyPassword "zhoupan22"
+        }
     }
     // 自定义apk输出路径和文件名，as3.0需要修改为一下写法
     applicationVariants.all { variant ->

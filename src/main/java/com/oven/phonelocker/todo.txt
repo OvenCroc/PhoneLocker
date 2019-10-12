@@ -1,7 +1,7 @@
 todo app statubar颜色更换
 todo 验证码输入的时候可以增加时间限制，比如说默认个30s输完，输不完自动更新，并且可以添加倒计时ui，初步设想是颜色由主题色到红紫色，并且有动画
 todo 输入正确验证码后，可以在app上显示一个使用倒计时的一个ui
-todo 完善app图标，以及打包版本信息等
-todo 修复列表图标bug
+todo 修复列表图标有时候加载过慢的bug
 todo 安装之后,跳转设置启动自启动
-todo 优化boxhelper
+todo 到时间了之后自动打开签到app签到
+todo 管理app界面增加搜索ui

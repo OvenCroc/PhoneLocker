@@ -15,6 +15,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:id="@+id/start_service_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="启动服务"
+        app:bl_ripple_color="@color/app_theme_focus"
+        app:bl_ripple_enable="true"
+        app:bl_solid_color="@color/app_theme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/main_tools_bar"
+        />
+
     <TextView
         android:id="@+id/add_app_tv"
         android:layout_width="wrap_content"

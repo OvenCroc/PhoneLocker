@@ -37,6 +37,7 @@ class MainActivity : BaseActivity(), View.OnClickListener {
         add_app_tv.setOnClickListener(this)
         manager_app_tv.setOnClickListener(this)
         just_lock_phone_tv.setOnClickListener(this)
+        start_service_btn.setOnClickListener(this)
         main_tools_bar.title = resources.getString(R.string.app_name)
         setSupportActionBar(main_tools_bar)
     }
@@ -115,6 +116,9 @@ class MainActivity : BaseActivity(), View.OnClickListener {
             just_lock_phone_tv -> {
                 val intent = Intent(this, TimePickActivity::class.java)
                 startActivity(intent)
+            }
+            start_service_btn -> {
+                startHelperService()
             }
             manager_app_tv -> {
                 val intent = Intent(this, ManagerAppListActivity::class.java)

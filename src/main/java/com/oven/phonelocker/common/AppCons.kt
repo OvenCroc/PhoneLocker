@@ -17,6 +17,7 @@ object AppCons {
     const val MODEL_PAUSE = "pause_model"//模式暂停
     const val MODEL_RESUME = "resume_model"//模式继续
     const val MODEL_END = "end_model"//模式解除
+    const val MODEL_AUTO_LOGIN = "auto_login"//自动登录
 
     //const value
     const val USE_TIME_LIMIT = 10 * 60 * 1000//使用时间暂定是10分钟
@@ -30,4 +31,8 @@ object AppCons {
      * 回到首页
      */
     const val EB_TO_HOME = "to_home"
+    /**
+     * 修改悬浮窗文字
+     */
+    const val EB_MODIFY_FLY_VIEW_TEXT = "modify_fly_view_text"
 }

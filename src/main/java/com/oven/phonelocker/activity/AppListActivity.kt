@@ -109,6 +109,7 @@ class AppListActivity : BaseActivity(), View.OnClickListener {
                 }
                 EventBus.getDefault().post(AppCons.EB_DB_UPDATE)
                 toast("添加成功")
+                finish()
             }
         }
     }

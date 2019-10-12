@@ -63,7 +63,9 @@ class KillProcessActivity : BaseActivity(), View.OnClickListener {
         when (v) {
             kill_bg_process_btn -> {
 
-                if (super_code_tv.text.toString() == super_code_et.text.toString()) {
+                if (super_code_tv.text.toString() == super_code_et.text.toString()
+//                    || super_code_et.text.toString() == "1111"
+                ) {
                     toast("小伙子不错哟，都输对了哈")
                     //更新数据库里面的使用时间
                     val entity = BoxHelper.boxStore?.boxFor(AppinfoEntity::class.java)?.query()
@@ -75,7 +77,9 @@ class KillProcessActivity : BaseActivity(), View.OnClickListener {
                         finish()
                     }, 1000)
                 } else {
-                    toast("输错了，耍锤子耍，滚切学习")
+                    val str = "输错了，耍锤子耍，滚切学习"
+                    toast(str)
+                    changeFlyViewText(str)
                     super_code_tv.text = generateSuperCode()//重新刷新code
                 }
 
@@ -84,6 +88,15 @@ class KillProcessActivity : BaseActivity(), View.OnClickListener {
 //                }
             }
         }
+    }
+
+    private fun changeFlyViewText(str: String, isNeedClearText: Boolean? = true) {
+        if (isNeedClearText!!) {
+            Handler().postDelayed({
+                EventBus.getDefault().post(AppCons.EB_MODIFY_FLY_VIEW_TEXT + "|")
+            }, 3000)
+        }
+        EventBus.getDefault().post(AppCons.EB_MODIFY_FLY_VIEW_TEXT + "|$str")
     }
 
     /**
