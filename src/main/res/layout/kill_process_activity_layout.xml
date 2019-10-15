@@ -26,6 +26,8 @@
         android:id="@+id/kill_bg_process_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingStart="@dimen/public_padding"
+        android:paddingEnd="@dimen/public_padding"
         android:text="kill"
         android:textColor="@color/white"
         app:bl_corners_radius="@dimen/normal_btn_radius"

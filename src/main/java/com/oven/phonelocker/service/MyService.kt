@@ -4,6 +4,7 @@ import android.accessibilityservice.AccessibilityService
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.PixelFormat
 import android.os.Build
 import android.os.Handler
@@ -14,6 +15,7 @@ import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.noober.background.BackgroundLibrary
 import com.oven.phonelocker.R
 import com.oven.phonelocker.activity.KillProcessActivity
@@ -22,6 +24,7 @@ import com.oven.phonelocker.activity.toast
 import com.oven.phonelocker.common.AppCons
 import com.oven.phonelocker.customview.FlyView
 import com.oven.phonelocker.entity.AppinfoEntity
+import com.oven.phonelocker.receiver.ScreenBroadcastReceiver
 import com.oven.phonelocker.utils.BoxHelper
 import com.oven.phonelocker.utils.Utils
 import org.greenrobot.eventbus.EventBus
@@ -39,15 +42,35 @@ class MyService : AccessibilityService(), View.OnClickListener {
     var calendar: Calendar? = null
     var alertView: FlyView? = null
     var anim: ObjectAnimator? = null
+    /**
+     * 最后一次进入到kill页面的包名
+     */
+    var lastCallEventAppName = ""
+    private val screenBroadcastReceiver = ScreenBroadcastReceiver()
+
     override fun onCreate() {
         super.onCreate()
         EventBus.getDefault().register(this)
         BackgroundLibrary.inject(this)
         addViewToWindowManager()
+        addScreenStatusReceiver()
+    }
+
+    /**
+     * 注册屏幕监听
+     *
+     * @author zhoupan
+     * Created at 2019/10/15 10:02
+     */
+    private fun addScreenStatusReceiver() {
+        val filter = IntentFilter()
+        filter.addAction(Intent.ACTION_USER_PRESENT)
+        filter.addAction(Intent.ACTION_SCREEN_OFF)
+        filter.addAction(Intent.ACTION_SCREEN_ON)
+        registerReceiver(screenBroadcastReceiver, filter)
     }
 
     var windowManager: WindowManager? = null
-    private var datalist: MutableList<AppinfoEntity> = mutableListOf()
     override fun onInterrupt() {
         toast("服务暂停", true)
     }
@@ -60,6 +83,7 @@ class MyService : AccessibilityService(), View.OnClickListener {
         alertView = null
         windowManager = null
         EventBus.getDefault().unregister(this)
+        unregisterReceiver(screenBroadcastReceiver)
         super.onDestroy()
     }
 
@@ -89,10 +113,41 @@ class MyService : AccessibilityService(), View.OnClickListener {
 
     private val flyViewListener: FlyView.FlyViewListener = object : FlyView.FlyViewListener {
         override fun onLongClick(view: FlyView) {
+            alertView?.setFlyBackgroundColor(
+                ContextCompat.getColor(
+                    this@MyService,
+                    R.color.app_theme_focus
+                )
+            )
+        }
+
+        override fun onUp(view: FlyView) {
+            alertView?.setFlyBackgroundColor(
+                ContextCompat.getColor(
+                    this@MyService,
+                    R.color.white_10
+                )
+            )
         }
 
         override fun onClick(view: FlyView) {
             toast("∑(っ°Д°;)っ\n点我干嘛,快点学习啊")
+            changeFlyViewText(lastCallEventAppName)
+            alertView?.setFlyBackgroundColor(
+                ContextCompat.getColor(
+                    this@MyService,
+                    R.color.app_theme
+                )
+            )
+            Handler().postDelayed({
+                changeFlyViewText()
+                alertView?.setFlyBackgroundColor(
+                    ContextCompat.getColor(
+                        this@MyService,
+                        R.color.white_10
+                    )
+                )
+            }, 5000)
         }
 
         override fun onMove(view: FlyView) {
@@ -119,7 +174,7 @@ class MyService : AccessibilityService(), View.OnClickListener {
         params.flags =
             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
         params.x = 0
-        params.y = 0
+        params.y = 500
         // window size
         params.gravity = Gravity.TOP or Gravity.LEFT
         params.width = ViewGroup.LayoutParams.WRAP_CONTENT
@@ -229,7 +284,7 @@ class MyService : AccessibilityService(), View.OnClickListener {
      * Created at 2019/10/9 16:56
      */
     private fun doAppController(event: AccessibilityEvent) {
-        datalist?.forEach {
+        getDBData()?.forEach {
             if (it.packageName.toString() == event.packageName.toString()) {//如果打开了受控制的app,就跳转到一个页面
                 calendar = Calendar.getInstance(Locale.CHINA)
                 val zoneStrArr = it.allowTimeZone?.split(",")
@@ -247,7 +302,7 @@ class MyService : AccessibilityService(), View.OnClickListener {
                     return
                 }
                 if (System.currentTimeMillis() - it.limitTime > AppCons.USE_TIME_LIMIT) {
-                    changeFlyViewText()
+                    lastCallEventAppName = it.appName
                     val i = Intent(this@MyService, KillProcessActivity::class.java)
                     i.putExtra("targetPackageName", event.packageName.toString())
                     i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -266,9 +321,8 @@ class MyService : AccessibilityService(), View.OnClickListener {
     fun onEvent(message: String) {
         when (message.split("|")[0]) {
             AppCons.EB_DB_UPDATE -> {//表示数据更新了
-                getDBData()//重新获取一下数据库里面的数据
             }
-            AppCons.EB_TO_HOME -> {//回收也
+            AppCons.EB_TO_HOME -> {//回首页
                 this.performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME)
             }
             AppCons.EB_MODIFY_FLY_VIEW_TEXT -> {//更改悬浮窗文字的事件
@@ -281,8 +335,7 @@ class MyService : AccessibilityService(), View.OnClickListener {
     override fun onServiceConnected() {
         super.onServiceConnected()
         toast("服务启动", true)
-        getDBData()
-//        createAlarm("11:50", AppCons.MODEL_AUTO_LOGIN)
+//        createAlarm("11:50", AppCons.MODEL_AUTO_LOGIN_ACTION)
     }
 
     /**
@@ -291,8 +344,8 @@ class MyService : AccessibilityService(), View.OnClickListener {
      * @author zhoupan
      * Created at 2019/10/8 14:54
      */
-    private fun getDBData() {
-        datalist = (BoxHelper.getList(AppinfoEntity::class.java)
+    private fun getDBData(): MutableList<AppinfoEntity> {
+        return (BoxHelper.getList(AppinfoEntity::class.java)
             ?: mutableListOf()) as MutableList<AppinfoEntity>
     }
 

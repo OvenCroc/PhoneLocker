@@ -13,11 +13,11 @@ object AppCons {
     const val sp_status = "status"
 
     //receiver action
-    const val MODEL_START = "start_model"//模式开始
-    const val MODEL_PAUSE = "pause_model"//模式暂停
-    const val MODEL_RESUME = "resume_model"//模式继续
-    const val MODEL_END = "end_model"//模式解除
-    const val MODEL_AUTO_LOGIN = "auto_login"//自动登录
+    const val MODEL_START_ACTION = "start_model"//模式开始
+    const val MODEL_PAUSE_ACTION = "pause_model"//模式暂停
+    const val MODEL_RESUME_ACTION = "resume_model"//模式继续
+    const val MODEL_END_ACTION = "end_model"//模式解除
+    const val MODEL_AUTO_LOGIN_ACTION = "auto_login"//自动登录
 
     //const value
     const val USE_TIME_LIMIT = 10 * 60 * 1000//使用时间暂定是10分钟

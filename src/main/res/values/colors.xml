@@ -9,6 +9,7 @@
     <color name="white">#ffffff</color>
     <color name="black">#000000</color>
     <color name="app_theme_focus">#1945F7</color>
-    <color name="half_white">#55ffffff</color>
+    <color name="half_white">#50ffffff</color>
+    <color name="white_10">#10ffffff</color>
     <color name="translate">#00ffffff</color>
 </resources>

@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="@dimen/public_padding">
+    android:padding="@dimen/public_padding"
+    tools:ignore="MissingPrefix">
 
     <ImageView
         android:id="@+id/app_icon_img"

@@ -4,6 +4,7 @@ import android.view.View
 import android.widget.CheckBox
 import android.widget.CompoundButton
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.chad.library.adapter.base.BaseItemDraggableAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.oven.phonelocker.R
@@ -31,6 +32,7 @@ class AppListAdapter(
         helper?.apply {
             Glide.with(this@AppListAdapter.mContext)
                 .load(mContext.packageManager.getApplicationIcon(item?.packageName))
+                .apply(RequestOptions().placeholder(R.drawable.ic_launcher_background))
                 .into(getView(R.id.app_icon_img))
             setText(
                 R.id.app_name_tv,

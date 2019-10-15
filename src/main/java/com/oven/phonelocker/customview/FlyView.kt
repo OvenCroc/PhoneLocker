@@ -1,12 +1,14 @@
 package com.oven.phonelocker.customview
 
 import android.animation.AnimatorSet
+import android.animation.LayoutTransition
 import android.animation.ValueAnimator
 import android.content.Context
 import android.os.Handler
 import android.os.Vibrator
 import android.util.AttributeSet
 import android.view.*
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
@@ -50,6 +52,7 @@ class FlyView : LinearLayout {
 
     private lateinit var windowManger: WindowManager
     private var mLayoutParams: WindowManager.LayoutParams? = null
+    private var lastBackgroundColor = 0
 
     constructor(context: Context) : super(context) {
         initFun(context)
@@ -64,9 +67,11 @@ class FlyView : LinearLayout {
         windowManger = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         mView = LayoutInflater.from(context).inflate(R.layout.add_view_layout, null)
         mVibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        //实现在size改变的时候有个改变的过渡
+        layoutTransition = LayoutTransition()
+        layoutTransition?.enableTransitionType(LayoutTransition.CHANGING)
         setFlyBackgroundColor(ContextCompat.getColor(context, R.color.app_theme))
         this.addView(mView)
-
     }
 
     fun setLayoutParam(params: WindowManager.LayoutParams) {
@@ -96,11 +101,26 @@ class FlyView : LinearLayout {
      * @author zhoupan
      * Created at 2019/10/12 12:00
      */
-    fun setFlyBackgroundColor(color: Int) {
-        val drawable = DrawableCreator.Builder()
-            .setCornersRadius(Utils.dp2px(context.resources.getDimension(R.dimen.normal_btn_radius)).toFloat())
-            .setSolidColor(color).build()
-        this.background = drawable
+    fun setFlyBackgroundColor(color: Int, duration: Long? = 500) {
+        val animator = ValueAnimator.ofFloat(0f, 1f)
+        animator.interpolator = AccelerateDecelerateInterpolator()
+        animator.addUpdateListener {
+            val drawable = DrawableCreator.Builder()
+                .setCornersRadius(Utils.dp2px(context.resources.getDimension(R.dimen.normal_btn_radius)).toFloat())
+                .setSolidColor(
+                    Utils.getCurrentColor(
+                        it.animatedFraction,
+                        lastBackgroundColor,
+                        color
+                    )
+                ).build()
+            this.background = drawable
+            if (it.animatedFraction == 1f) {
+                lastBackgroundColor = color
+            }
+        }
+        animator.duration = duration!!
+        animator.start()
     }
 
 
@@ -168,6 +188,8 @@ class FlyView : LinearLayout {
                 MotionEvent.ACTION_UP -> {
                     if (isClick(event)) {
                         listener?.onClick(this@FlyView)
+                    } else {
+                        listener?.onUp(this@FlyView)
                     }
                     isLongClickNow = false
                     isTouching = false
@@ -181,5 +203,6 @@ class FlyView : LinearLayout {
         fun onLongClick(view: FlyView)
         fun onClick(view: FlyView)
         fun onMove(view: FlyView)
+        fun onUp(view: FlyView)
     }
 }

@@ -155,8 +155,8 @@ fun Context.toast(str: String, isPrintLog: Boolean? = false) {
     }
 }
 
-fun mylog(str: String) {
+fun mylog(str: String, tag: String? = "zp") {
     if (AppCons.IS_DEBUG) {
-        Log.i("zp", str)
+        Log.i(tag, str)
     }
 }

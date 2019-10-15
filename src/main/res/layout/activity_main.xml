@@ -19,14 +19,16 @@
         android:id="@+id/start_service_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/public_margin"
         android:text="启动服务"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        app:bl_corners_radius="@dimen/normal_btn_radius"
         app:bl_ripple_color="@color/app_theme_focus"
         app:bl_ripple_enable="true"
         app:bl_solid_color="@color/app_theme"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/main_tools_bar"
-        />
+        app:layout_constraintStart_toStartOf="@id/add_app_tv"
+        app:layout_constraintTop_toBottomOf="@id/add_app_tv" />
 
     <TextView
         android:id="@+id/add_app_tv"

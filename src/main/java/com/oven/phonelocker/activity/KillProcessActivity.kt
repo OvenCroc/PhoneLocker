@@ -26,6 +26,7 @@ class KillProcessActivity : BaseActivity(), View.OnClickListener {
      * 需要被杀的app的包名
      */
     private var targetPackageName = ""
+    var entity: MutableList<AppinfoEntity> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +39,10 @@ class KillProcessActivity : BaseActivity(), View.OnClickListener {
 
     override fun initData() {
         targetPackageName = intent.getStringExtra("targetPackageName") ?: ""
+        entity = BoxHelper.boxStore?.boxFor(AppinfoEntity::class.java)?.query()
+            ?.equal(AppinfoEntity_.packageName, targetPackageName)?.build()?.find()
+            ?: mutableListOf()
+        kill_bg_process_btn.text = "KILL ${entity[0].appName}"
         super_code_tv.text = generateSuperCode()
     }
 
@@ -68,11 +73,9 @@ class KillProcessActivity : BaseActivity(), View.OnClickListener {
                 ) {
                     toast("小伙子不错哟，都输对了哈")
                     //更新数据库里面的使用时间
-                    val entity = BoxHelper.boxStore?.boxFor(AppinfoEntity::class.java)?.query()
-                        ?.equal(AppinfoEntity_.packageName, targetPackageName)?.build()?.find()
                     entity?.get(0)?.limitTime = System.currentTimeMillis()
                     BoxHelper.boxStore?.boxFor(AppinfoEntity::class.java)?.put(entity?.get(0))
-                    EventBus.getDefault().post(AppCons.EB_DB_UPDATE)
+//                    EventBus.getDefault().post(AppCons.EB_DB_UPDATE)
                     Handler().postDelayed({
                         finish()
                     }, 1000)

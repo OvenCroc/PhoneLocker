@@ -16,13 +16,13 @@ class TimeReceiver : BroadcastReceiver() {
         context?.apply {
             intent?.apply {
                 when (action) {
-                    AppCons.MODEL_START -> {
+                    AppCons.MODEL_START_ACTION -> {
                         mylog("作死模式开始了")
                     }
-                    AppCons.MODEL_END -> {
+                    AppCons.MODEL_END_ACTION -> {
                         mylog("作死模式结束了,可以耍手机了")
                     }
-                    AppCons.MODEL_AUTO_LOGIN -> {
+                    AppCons.MODEL_AUTO_LOGIN_ACTION -> {
                         toast("autologin", true)
                     }
                 }

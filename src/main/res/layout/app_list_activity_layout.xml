@@ -30,6 +30,39 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <EditText
+        android:id="@+id/search_et"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/normal_btn_height"
+        android:layout_marginStart="@dimen/public_margin"
+        android:layout_marginEnd="@dimen/public_margin"
+        android:ellipsize="end"
+        android:hint="app包名或者名称"
+        android:imeOptions="actionSearch"
+        android:inputType="text"
+        android:maxLines="1"
+        android:paddingStart="@dimen/public_padding"
+        android:paddingEnd="@dimen/public_padding"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        android:textSize="14sp"
+        app:bl_corners_radius="@dimen/normal_btn_radius"
+        app:bl_solid_color="@color/app_theme"
+        app:layout_constraintEnd_toEndOf="@id/swipe"
+        app:layout_constraintStart_toStartOf="@id/swipe"
+        app:layout_constraintTop_toTopOf="@id/swipe" />
+
+    <ImageView
+        android:id="@+id/clear_search_content_img"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="@dimen/public_padding"
+        android:layout_marginRight="@dimen/public_padding"
+        android:src="@drawable/clear_search_content"
+        app:layout_constraintBottom_toBottomOf="@id/search_et"
+        app:layout_constraintEnd_toEndOf="@id/search_et"
+        app:layout_constraintTop_toTopOf="@id/search_et" />
+
     <TextView
         android:id="@+id/add_tv"
         android:layout_width="wrap_content"
@@ -49,5 +82,12 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/search_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="clear_search_content_img,search_et" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

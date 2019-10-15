@@ -3,11 +3,13 @@ package com.oven.phonelocker.activity
 import android.content.Intent
 import android.graphics.Canvas
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback
 import com.chad.library.adapter.base.listener.OnItemSwipeListener
@@ -24,7 +26,15 @@ import org.greenrobot.eventbus.EventBus
  * Created by xm zhoupan on 2019/10/8.
  */
 class ManagerAppListActivity : BaseActivity(), OnItemSwipeListener,
-    BaseQuickAdapter.OnItemClickListener {
+    BaseQuickAdapter.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener {
+    override fun onRefresh() {
+        Handler().postDelayed({
+            if (swipeLayout.isRefreshing) {
+                swipeLayout.isRefreshing = false
+            }
+        }, 1000)
+    }
+
     var datalist = mutableListOf<AppinfoEntity>()
     var adapter: AppListAdapter? = null
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +43,7 @@ class ManagerAppListActivity : BaseActivity(), OnItemSwipeListener,
     }
 
     override fun initView() {
+        swipeLayout.setOnRefreshListener(this)
         initToolBar()
         initRc()
     }
